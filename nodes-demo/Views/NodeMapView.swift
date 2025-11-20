@@ -13,19 +13,48 @@ struct NodeMapView: View {
     @Environment(AppModel.self) var appModel
     @State private var draggedEntity: Entity?
     @State private var nodePositions: [String: SIMD3<Float>] = [:]
-    @State private var selectedNodeId: String? = nil
     @State private var entityMap: [String: Entity] = [:]
-
+    @State private var realityViewContent: RealityViewContent?
+    
     var body: some View {
         RealityView { content in
-            for node in appModel.nodes {
+            realityViewContent = content
+            updateEntities(in: content)
+        }
+        .gesture(selectiveDragGesture)
+        .gesture(tapGesture)
+        .onChange(of: appModel.nodes) { oldValue, newValue in
+            guard let content = realityViewContent else { return }
+            updateEntities(in: content)
+        }
+        .onChange(of: appModel.selectedNodeId) { oldValue, newValue in
+            let ids = appModel.nodes.map(\.id)
+            ids.forEach {
+                updateNodeAppearance(for: $0, isSelected: newValue == $0)
+            }
+        }
+    }
+    
+    private func updateEntities(in content: RealityViewContent) {
+        let currentNodeIds = Set(appModel.nodes.map { $0.id })
+        
+        let existingEntityIds = Set(entityMap.keys)
+        
+        let removedIds = existingEntityIds.subtracting(currentNodeIds)
+        for id in removedIds {
+            if let entity = entityMap[id] {
+                entity.removeFromParent()
+                entityMap.removeValue(forKey: id)
+            }
+        }
+        
+        for node in appModel.nodes {
+            if entityMap[node.id] == nil {
                 let capsuleEntity = createGlassCapsuleNode(for: node)
                 entityMap[node.id] = capsuleEntity
                 content.add(capsuleEntity)
             }
         }
-        .gesture(selectiveDragGesture)
-        .gesture(tapGesture)
     }
     
     private var selectiveDragGesture: some Gesture {
@@ -58,15 +87,15 @@ struct NodeMapView: View {
                 
                 let tappedNodeId = nodeComponent.node.id
                 
-                if selectedNodeId == tappedNodeId {
-                    selectedNodeId = nil
+                if appModel.selectedNodeId == tappedNodeId {
+                    appModel.selectedNodeId = nil
                     updateNodeAppearance(for: tappedNodeId, isSelected: false)
                 } else {
-                    if let previousSelectedId = selectedNodeId {
+                    if let previousSelectedId = appModel.selectedNodeId {
                         updateNodeAppearance(for: previousSelectedId, isSelected: false)
                     }
                     
-                    selectedNodeId = tappedNodeId
+                    appModel.selectedNodeId = nodeComponent.node.id
                     updateNodeAppearance(for: tappedNodeId, isSelected: true)
                 }
             }
@@ -75,7 +104,7 @@ struct NodeMapView: View {
     private func createGlassCapsuleNode(for node: Node) -> Entity {
         let parentEntity = Entity()
 
-        let isSelected = selectedNodeId == node.id
+        let isSelected = appModel.selectedNodeId == node.id
         let (capsuleWidth, capsuleHeight) = calculateDynamicSize(for: node, isSelected: isSelected)
         
         let capsule = createGlassCapsule(width: capsuleWidth, height: capsuleHeight, for: node, isSelected: isSelected)
@@ -96,11 +125,7 @@ struct NodeMapView: View {
         wrapperEntity.addChild(text)
 
         parentEntity.addChild(wrapperEntity)
-        parentEntity.position = SIMD3<Float>(
-            node.x,
-            node.y,
-            node.z
-        )
+        parentEntity.position = node.position
         
         let collisionShape = ShapeResource.generateBox(width: capsuleWidth, height: capsuleHeight, depth: 0.02)
         parentEntity.components.set(CollisionComponent(

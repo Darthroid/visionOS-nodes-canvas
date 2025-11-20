@@ -8,13 +8,16 @@ import Foundation
 import RealityKit
 import RealityKitContent
 
-struct Node: Identifiable {
+struct Node: Identifiable, Equatable {
     let id: String
     let name: String
     let description: String
     let x: Float
     let y: Float
     let z: Float
+    
+    var position: SIMD3<Float> { .init(x, y, z) }
+    var positionDescription: String { "(\(x), \(y), \(z))" }
 }
 
 struct NodeDataComponent: Component {
