@@ -273,6 +273,8 @@ struct ImmersiveNodeMapView: View {
             mode: .kinematic
         ))
         
+        parentEntity.components.set(BillboardComponent())
+        
         parentEntity.components.set(InputTargetComponent())
         parentEntity.components.set(NodeDataComponent(node: node))
         
@@ -312,7 +314,10 @@ struct ImmersiveNodeMapView: View {
             isMetallic: false
         )
 
-        return ModelEntity(mesh: capsuleMesh, materials: [material])
+        let capsuleEntity = ModelEntity(mesh: capsuleMesh, materials: [material])
+        capsuleEntity.components.set(BillboardComponent())
+        
+        return capsuleEntity
     }
 
     private func createTextLabel(
@@ -348,6 +353,8 @@ struct ImmersiveNodeMapView: View {
         
         let textEntity = ModelEntity(mesh: textMesh, materials: [textMaterial])
         textEntity.position.z = 0.002
+        
+        textEntity.components.set(BillboardComponent())
 
         return textEntity
     }
