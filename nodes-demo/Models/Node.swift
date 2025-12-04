@@ -10,7 +10,7 @@ import RealityKitContent
 import SwiftData
 
 @Model
-class Node: Identifiable, Equatable {
+class Node: Identifiable {
     @Attribute(.unique) var id: String
     var name: String
     var detail: String

@@ -71,8 +71,7 @@ final class AppModel: Sendable {
         )
         
         context?.insert(node)
-        try? context?.save()
-        fetchItems()
+        save()
     }
     
     func removeNode(at indexSet: IndexSet) {
@@ -89,7 +88,12 @@ final class AppModel: Sendable {
         try? context?.delete(model: NodeConnection.self, where: #Predicate<NodeConnection> { item in
             item.fromNodeId == nodeId || item.toNodeId == nodeId
         })
-        try? context?.save()
+        save()
+    }
+    
+    fileprivate func save() {
+        guard let context, context.hasChanges else { return }
+        try? context.save()
         fetchItems()
     }
     
@@ -99,8 +103,7 @@ final class AppModel: Sendable {
             objectToUpdate.y = newPosition.y
             objectToUpdate.z = newPosition.z
         }
-        try? context?.save()
-        fetchItems()
+        save()
     }
     
     func addConnection(from fromNodeId: String, to toNodeId: String) {
@@ -119,14 +122,12 @@ final class AppModel: Sendable {
             toNodeId: toNodeId
         )
         context?.insert(connection)
-        try? context?.save()
-        fetchItems()
+        save()
     }
     
     func removeConnection(_ connection: NodeConnection) {
         context?.delete(connection)
-        try? context?.save()
-        fetchItems()
+        save()
     }
     
     func fetchItems() {
