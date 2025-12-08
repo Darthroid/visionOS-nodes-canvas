@@ -162,6 +162,20 @@ final class AppModel: Sendable {
         save()
     }
     
+    
+    func removeConnectionsBetween(_ node1: Node, and node2: Node) {
+        
+        let connections = connections.filter({
+            $0.fromNodeId == node1.id && $0.toNodeId == node2.id
+            || $0.fromNodeId == node2.id && $0.toNodeId == node1.id
+        })
+        
+        connections.forEach {
+            removeConnection($0)
+        }
+    }
+    
+    
     func removeConnection(_ connection: NodeConnection) {
         context?.delete(connection)
         save()

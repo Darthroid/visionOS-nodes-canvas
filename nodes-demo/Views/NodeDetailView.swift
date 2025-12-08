@@ -35,14 +35,23 @@ struct NodeDetailView: View {
                 Text("Connected Nodes")
                     .font(.title)
                     .padding(.vertical)
-                List(appModel.nodesConnectedWith(node: node)) { node in
-                    VStack(alignment: .leading) {
-                        Text(node.name)
-                            .font(.headline)
-                        Text(node.positionDescription)
-                            .font(.footnote)
+                List(appModel.nodesConnectedWith(node: node)) { connectedNode in
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(connectedNode.name)
+                                .font(.headline)
+                            Text(connectedNode.positionDescription)
+                                .font(.footnote)
+                        }
+                        
+                        Spacer()
+                        
+                        Button {
+                            appModel.removeConnectionsBetween(connectedNode, and: node)
+                        } label: {
+                            Image(systemName: "xmark")
+                        }
                     }
-                    .listRowInsets(.init(top: 0, leading: -20, bottom: 0, trailing: -20))
                 }
                 .listStyle(.plain)
             }
@@ -57,12 +66,8 @@ struct NodeDetailView: View {
                     Text("Delete")
                 }
                 
-                Button(appModel.hasConnection(nodeId: node.id) ? "Unlink" : "Link") {
-                    if appModel.hasConnection(nodeId: node.id) {
-                        appModel.removeConnection(nodeId: node.id)
-                    } else {
-                        showLinkEditor.toggle()
-                    }
+                Button("Link") {
+                    showLinkEditor.toggle()
                 }
                 
                 Button {
