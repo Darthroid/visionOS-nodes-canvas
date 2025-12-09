@@ -14,7 +14,7 @@ struct NodeMapView: View {
                 GridView(cellSize: pointsPerMeter, maxHeight: maxHeight, geometry: geometry)
                     .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                     .allowsHitTesting(false)
-
+                
                 // Height limit indicator
                 HeightLimitView(maxHeight: maxHeight, pointsPerMeter: pointsPerMeter, geometry: geometry)
                     .stroke(Color.red.opacity(0.7), lineWidth: 2)
@@ -42,6 +42,7 @@ struct NodeMapView: View {
                 ForEach(appModel.nodes) { node in
                     NodeView(node: node, isSelected: appModel.selectedNodeId == node.id)
                         .position(convertToViewCoordinates(node.position, in: geometry))
+                        .zIndex(appModel.selectedNodeId == node.id ? 1 : 0) // Selected nodes appear on top
                         .gesture(
                             DragGesture()
                                 .onChanged { value in
@@ -126,9 +127,9 @@ struct NodeView: View {
             RoundedRectangle(cornerRadius: 25)
                 .fill(Color(uiColor: .lightGray))
                 .shadow(
-                    color: .black.opacity(0.3),
-                    radius: 6,
-                    x: 0, y: 3
+                    color: .black.opacity(isSelected ? 0.5 : 0.3),
+                    radius: isSelected ? 10 : 6,
+                    x: 0, y: isSelected ? 5 : 3
                 )
         )
         .frame(maxWidth: 400)
