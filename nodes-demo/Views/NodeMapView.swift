@@ -101,13 +101,13 @@ struct NodeView: View {
             VStack(spacing: 8) {
                 Text(node.name)
                     .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(.white)
+                    .foregroundColor(.init(uiColor: .darkGray))
                     .multilineTextAlignment(.center)
                 
                 if isSelected {
                     Text(node.detail.isEmpty ? "No description" : node.detail)
                         .font(.system(size: 14))
-                        .foregroundColor(.white.opacity(node.detail.isEmpty ? 0.6 : 0.9))
+                        .foregroundColor(.init(uiColor: .darkGray).opacity(node.detail.isEmpty ? 0.6 : 0.9))
                         .multilineTextAlignment(.center)
                 }
             }
@@ -125,7 +125,8 @@ struct NodeView: View {
         .padding(.vertical, 12)
         .background(
             RoundedRectangle(cornerRadius: 25)
-                .fill(Color(uiColor: .lightGray))
+                .stroke(.gray, lineWidth: 1)
+                .fill(Color(uiColor: .white))
                 .shadow(
                     color: .black.opacity(isSelected ? 0.5 : 0.3),
                     radius: isSelected ? 10 : 6,
