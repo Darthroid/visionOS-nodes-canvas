@@ -243,8 +243,8 @@ struct ImmersiveNodeMapView: View {
         
         let capsule = createCapsule(width: capsuleWidth, height: capsuleHeight, for: node, isSelected: isSelected)
 
-        let textContent = isSelected && !node.detail.isEmpty ?
-            "\(node.name)\n \n\(node.detail)" :
+        let textContent = isSelected ?
+            "\(node.name)\n \n\(node.detail.isEmpty ? "No description" : node.detail)" :
             node.name
         
         let text = createTextLabel(
@@ -326,9 +326,8 @@ struct ImmersiveNodeMapView: View {
         let expandedHeight: Float = 0.06
         let padding: Float = 0.02
 
-        let textToMeasure = !node.detail.isEmpty ?
-        "\(node.name)\n \n\(node.detail)" :
-            node.name
+        let textToMeasure =
+        "\(node.name)\n \n\(node.detail.isEmpty ? "No description" : node.detail)"
 
         // Calculate proper dimensions with text wrapping
         let textContainer = CGRect(
@@ -441,8 +440,8 @@ struct ImmersiveNodeMapView: View {
         // Create new capsule and text
         let capsule = createCapsule(width: capsuleWidth, height: capsuleHeight, for: node, isSelected: isSelected)
         
-        let textContent = isSelected && !node.detail.isEmpty ?
-            "\(node.name)\n \n\(node.detail)" :
+        let textContent = isSelected ?
+            "\(node.name)\n \n\(node.detail.isEmpty ? "No description" : node.detail)" :
             node.name
         
         let text = createTextLabel(
